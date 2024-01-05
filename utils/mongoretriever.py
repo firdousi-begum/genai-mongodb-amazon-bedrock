@@ -45,16 +45,16 @@ class MongoDBExtendedRetriever(BaseRetriever):
            "Item Keywords: " + metadata["item_keywords"] + ".")
         return content, metadata
     
-    def combine_metadata_c(self, doc) -> str:
-        #print(doc)
-        metadata = {
-            "Item Name": doc["item_name"],
-             "Item Keywords": doc["bullet_point"]
-        }
-        content = ("Item Name: " + doc["item_name"] + ". " +
-           "Item Description: " + doc["bullet_point"] + ". " +
-           "Item Keywords: " + doc["item_keywords"] + ".")
-        return content, metadata
+    # def combine_metadata_c(self, doc) -> str:
+    #     #print(doc)
+    #     metadata = {
+    #         "Item Name": doc["item_name"],
+    #          "Item Keywords": doc["bullet_point"]
+    #     }
+    #     content = ("Item Name: " + doc["item_name"] + ". " +
+    #        "Item Description: " + doc["bullet_point"] + ". " +
+    #        "Item Keywords: " + doc["item_keywords"] + ".")
+    #     return content, metadata
  
     def _get_relevant_documents(
         self, query: str, *, run_manager: CallbackManagerForRetrieverRun
@@ -62,20 +62,20 @@ class MongoDBExtendedRetriever(BaseRetriever):
         
         #print('In fuction: ',self.vectorstore._index_name, query)
         docs_list = []
-        mongo_query = [
-            {
-                "$search": {
-                    "index": self.vectorstore._index_name,
-                    "knnBeta": {
-                        "vector": self.vectorstore.embeddings.embed_query(query),
-                        "path": "embedding",
-                        "k": 10,
-                    }
-                }
-            }
-        ]
-
+        # mongo_query = [
+        #     {
+        #         "$search": {
+        #             "index": self.vectorstore._index_name,
+        #             "knnBeta": {
+        #                 "vector": self.vectorstore.embeddings.embed_query(query),
+        #                 "path": "embedding",
+        #                 "k": 10,
+        #             }
+        #         }
+        #     }
+        # ]
         #docs = self.vectorstore._collection.aggregate(mongo_query)
+
         docs =self.vectorstore.similarity_search(query, **self.search_kwargs)
 
         #print('Docs: ',docs)
