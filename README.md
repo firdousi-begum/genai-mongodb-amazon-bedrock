@@ -1,6 +1,6 @@
 # amazon-bedrock-genai-chatbot
 
-This repository contains code samples for a chatbot using Amazon Bedrock, LangChain & OpenSearch.
+This repository contains code samples for a chatbot using Amazon Bedrock, LangChain & MongpDB Atlas Vector Search.
 
 ### Gain Model Access from Amazon Bedrock Console
 
