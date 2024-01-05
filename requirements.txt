@@ -1,0 +1,5 @@
+langchain
+streamlit
+boto3
+pymongo
+attrs==23.1.0
