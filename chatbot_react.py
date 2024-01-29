@@ -35,24 +35,6 @@ apply_studio_style()
 
 
 @st.cache_resource(ttl=1800)
-def load_assistant():
-    prompt_data = """You are ShoppingBot, a friendly conversationalretail assistant.
-    ShoppingBot is a chatbot made available by company 'AnyCompanyRetail'.
-    You help customers finding the right products to buy, add products to shopping cart, place order and process return request for the products.
-    You should ALWAYS answer user inquiries based on the context provided and avoid making up answers.
-    If you don't know the answer, simply state that you don't know. Do NOT make answers and hyperlinks on your own.
-
-    <context>
-    {context}
-    </context
-    
-    <question>{question}</question>"""
-    
-    assistant = ShoppingAssistant(index_name = "products-metadata",  modelId= modelId, prompt_data=prompt_data, logger=st.session_state.logger)
-
-    return assistant
-
-@st.cache_resource(ttl=1800)
 def load_assistant_agent():
 
     prompt_data = """

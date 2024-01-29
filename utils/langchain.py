@@ -7,7 +7,7 @@ from langchain.prompts import PromptTemplate
 from langchain.agents import AgentType, initialize_agent
 from langchain.schema import BaseMessage
 from langchain.prompts.chat import MessagesPlaceholder
-import langchain
+#import langchain
 
 class LangChainAssistant():
     # We are also providing a different chat history retriever which outputs the history as a Claude chat (ie including the \n\n)
@@ -142,7 +142,7 @@ class LangChainAssistant():
         Previous conversation history:
         <history>{chat_history}</history>
         """
-        langchain.debug=True
+        #langchain.debug=True
 
         memory = ConversationBufferMemory(
             k= 3,
