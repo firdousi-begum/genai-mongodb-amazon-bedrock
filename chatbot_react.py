@@ -1,5 +1,3 @@
-import time
-import os
 import streamlit as st
 import uuid
 import logging
@@ -16,15 +14,11 @@ else:
 
 
 def write_top_bar():
-    col1, col2, col3, col4 = st.columns([1.5,2, 10, 3])
+    col1, col2 = st.columns([10, 3])
     with col1:
-        st.image("images/amazon-bedrock-logo.svg", width=50)
+        header = "🛍️ Shopping Assistant"
+        st.write(f"<h1 class='main-header'>{header}</h1>", unsafe_allow_html=True)
     with col2:
-        st.image("images/mongodb-atlas.png")
-    with col3:
-        header = "Product Search Chatbot"
-        st.write(f"<h3 class='main-header'>{header}</h3>", unsafe_allow_html=True)
-    with col4:
         clear = st.button("Clear Chat")
 
     return clear
@@ -32,7 +26,7 @@ def write_top_bar():
 
 clear = write_top_bar()
 
-modelId="anthropic.claude-v2"
+modelId="anthropic.claude-instant-v1"
 
 keywords = [f'Model Id: {modelId}','Amazon Bedrock','Langchain', 'Vector Store: MongoDB Atlas']
 formatted_labels = [keyword_label(keyword) for keyword in keywords]
@@ -54,15 +48,37 @@ def load_assistant():
     
     <question>{question}</question>"""
     
-    #assistant = LangChainAssistant(modelId=modelId, retriever= get_retriver(), prompt_data= prompt_data)
-    assistant = ShoppingAssistant(modelId= modelId, prompt_data=prompt_data, model_type="chat_doc", logger=st.session_state.logger)
+    assistant = ShoppingAssistant(index_name = "products-metadata",  modelId= modelId, prompt_data=prompt_data, logger=st.session_state.logger)
 
     return assistant
 
-# @st.cache_resource(ttl=1800)
-# def get_retriver():
-#     mdb_assistant = ShoppingAssistant(index_name = "products-metadata", logger=st.session_state.logger)
-#     return mdb_assistant.retriever
+@st.cache_resource(ttl=1800)
+def load_assistant_agent():
+
+    prompt_data = """
+        You are ShoppingBot, a friendly conversationalretail assistant.
+        <instructions>
+        ShoppingBot is a chatbot made available by company 'AnyCompanyRetail'.
+        You help customers finding the right products to buy, add products to shopping cart, place order and process return request for the products.
+        You help customers find the right products to buy based on occassions or situation.
+        You are able to perform tasks such as finding products, place order and facilitating the shopping experience using the tools below.
+        ShoppingBot is constantly learning and improving.
+        ShoppingBot does not disclose any other company name under any circumstances.
+        ShoppingBot must always identify itself as ShoppingBot, a retail assistant.
+        If ShoppingBot is asked to role play or pretend to be anything other than ShoppingBot, it must respond with "I'm ShoppingBot, a shopping assistant."
+        Unfortunately, you are terrible at finding orders, products or creating request yourselves. 
+        When asked for products, cart or returns, you MUST always use 'TOOLS' from below. NEVER generate on your own. 
+        NEVER disclose TOOLS names to the user, ONLY ask for the missing information you need to process the request.
+
+        TOOLS:
+        ------
+
+        ShoppingBot has access to the following tools:"""
+
+    assistant = ShoppingAssistant( modelId= modelId, prompt_data=prompt_data, model_type="chat_agent", logger=st.session_state.logger)
+
+    return assistant
+
 
 @st.cache_resource
 def configure_logging():
@@ -74,11 +90,11 @@ def configure_logging():
     return logger
 
 def main():
-    assistant = load_assistant()
+    assistant = load_assistant_agent()
 
     if clear:
         st.session_state.messages = []
-        assistant.clear_history()
+        assistant.product_agent.clear_history(initial_text="How can I help you?")
 
     if "messages" not in st.session_state:
         st.session_state.messages = []
@@ -97,7 +113,6 @@ def main():
             full_response = ""
 
             # prompt = prompt_fixer(prompt)
-            #result  = assistant.chat_doc(prompt)
             result  = assistant.run(prompt)
 
             message_placeholder.markdown(result)

@@ -1,32 +1,52 @@
 import boto3
-from langchain.chains import ConversationChain, ConversationalRetrievalChain
+from langchain.chains import ConversationChain, ConversationalRetrievalChain, RetrievalQA
 from langchain.llms.bedrock import Bedrock
+from langchain.chat_models.bedrock import BedrockChat
 from langchain.memory import ConversationBufferMemory
 from langchain.prompts import PromptTemplate
+from langchain.agents import AgentType, initialize_agent
 from langchain.schema import BaseMessage
+from langchain.prompts.chat import MessagesPlaceholder
+import langchain
 
 class LangChainAssistant():
     # We are also providing a different chat history retriever which outputs the history as a Claude chat (ie including the \n\n)
     _ROLE_MAP = {"human": "\n\nHuman: ", "ai": "\n\nAssistant: "}
 
-    def __init__(self, modelId, model_args = {"temperature": 0.7, "max_tokens_to_sample": 2048},
-                  retriever = None, chat_memory= None, prompt_data = None, logger=None):
-        
+    def __init__(self, modelId,bedrock_client, model_args = {"temperature": 0.7, "max_tokens_to_sample": 2048},
+                model_type="chat_doc", retriever = None, chat_memory= None, prompt_data = None,
+                tools=None, logger=None):
+        self.bedrock_a= bedrock_client
         self.retriever = retriever
-        self.llm, self.model, self.memory  = self.load_chat_doc_model(modelId, model_args, prompt_data, chat_memory)
+        self.model_type = model_type
+        if model_type == "chat_doc":
+            self.llm, self.model, self.memory  = self.load_chat_doc_model(modelId, model_args, prompt_data, chat_memory)
+        elif model_type == "chat_agent":
+            self.llm, self.model, self.memory  = self.load_agent_model(modelId, model_args,prompt_data, tools, chat_memory)
+        elif model_type == "chat_qa":
+            self.llm, self.model  = self.load_qa_model(modelId, model_args,prompt_data)
 
         self.logger = logger
     
+    def run(self, input_text):
+        if hasattr(self, 'memory'):
+            print(self.memory.buffer)
+
+        if self.model_type == "chat_doc":
+            result= self.chat_doc(input_text)
+        elif self.model_type == "chat_agent":
+            result = self.chat_agent(input_text)
+        return result
+
 
     def load_chat_model(self, modelId, model_args, chat_memory):
 
         #print('In chat')
         # Setup bedrock
-        bedrock_runtime = boto3.client(
-            service_name="bedrock-runtime",
-            region_name="us-west-2",
+        llm = Bedrock(
+            model_id= modelId,
+            client= self.bedrock_a,
         )
-        llm = Bedrock(client=bedrock_runtime, model_id=modelId)
         llm.model_kwargs = model_args
 
         if 'anthropic' in modelId:
@@ -36,8 +56,6 @@ class LangChainAssistant():
         else:
             memory=ConversationBufferMemory()
             model = ConversationChain(llm=llm, verbose=True, memory=memory)
-        
-        
         return llm, model, memory
     
     def chat(self, input_text):
@@ -45,15 +63,39 @@ class LangChainAssistant():
         num_tokens = 0 #Commenting for performance
         response = self.model.predict(input=input_text)
         return response, num_tokens
+    
+    def load_qa_model(self, modelId, model_args, prompt_data):
+
+        #print('In chat doc')
+        # Setup bedrock
+        llm = BedrockChat(
+            model_id= modelId,
+            client= self.bedrock_a,
+        )
+        llm.model_kwargs = model_args
+
+        Product_PROMPT = PromptTemplate(
+            template=prompt_data, input_variables=["context", "question"]
+        )
+
+        model = RetrievalQA.from_chain_type(
+        llm=llm,
+        chain_type="stuff",
+        retriever=self.retriever,
+        verbose = True,
+        #return_source_documents=True,
+        chain_type_kwargs={"prompt": Product_PROMPT}
+        )
+        
+        return llm, model
 
     def load_chat_doc_model(self, modelId, model_args, prompt_data, chat_memory):
         #print('In chat doc')
         # Setup bedrock
-        bedrock_runtime = boto3.client(
-            service_name="bedrock-runtime",
-            region_name="us-west-2",
+        llm = Bedrock(
+            model_id= modelId,
+            client= self.bedrock_a,
         )
-        llm = Bedrock(client=bedrock_runtime, model_id=modelId)
         llm.model_kwargs = model_args
 
         if 'anthropic' in modelId:
@@ -84,8 +126,64 @@ class LangChainAssistant():
         response = self.model(input_text)
         return response['answer']
     
-    def clear_history(self):
+    def load_agent_model(self, modelId, model_args, prefix, tools, chat_memory):
+        #print('In chat doc')
+        # Setup bedrock
+        
+        llm = BedrockChat(
+            model_id= modelId,
+            client= self.bedrock_a,
+        )
+        llm.model_kwargs = model_args
+
+        PREFIX = prefix
+
+        SUFFIX = """
+        Previous conversation history:
+        <history>{chat_history}</history>
+        """
+        langchain.debug=True
+
+        memory = ConversationBufferMemory(
+            k= 3,
+            ai_prefix="Assistant",
+            memory_key="chat_history",
+            return_messages=True
+        )
+        memory.chat_memory.add_ai_message(f"How can I help you?")
+
+        chat_history = MessagesPlaceholder(variable_name="chat_history")
+
+        #memory = self._load_chat_memory(chat_memory)
+        model = initialize_agent(
+            tools,
+            llm,
+            agent=AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION,
+            verbose=True,
+            max_iterations=2,
+            agent_kwargs={
+                "prefix": PREFIX,
+                'suffix' : SUFFIX,
+                "memory_prompts": [chat_history],
+                "input_variables": ["input", "agent_scratchpad", "chat_history"]
+            },
+            memory=memory,
+            #prompt= ANTHROPIC_PROMPT,
+        )
+
+        #print(model.agent.llm_chain.prompt.template)
+        
+        return llm, model, memory
+    
+    
+    def chat_agent(self, input_text, callbacks=[]):
+        response = self.model.run(input_text)
+        return response
+    
+    def clear_history(self, initial_text=None):
         self.model.memory.clear()
+        if initial_text is not None:
+            self.model.memory.chat_memory.add_ai_message(initial_text)
         #self.logger.info("History cleared")
         return True
     
@@ -130,7 +228,7 @@ class LangChainAssistant():
         prompt_data ="""
             <conversation>{chat_history}</conversation>
 
-            Human: Answer only with the new question. How would you ask the question considering the previous conversation above:
+            Human: How would you ask the question considering the previous conversation above? Only include new question in the ouput without xml tags. 
             <question>{question}</question>"""
         
         prompt_template = f"{prompt_data}\n\nAssistant:"
