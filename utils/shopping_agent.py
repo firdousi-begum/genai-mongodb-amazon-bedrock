@@ -46,7 +46,7 @@ class ShoppingAssistant():
 
         <question>{question}</question>"""
         modelId="anthropic.claude-instant-v1"
-        assistant = LangChainAssistant(modelId=modelId, bedrock_client=self.boto3_bedrock, retriever= self.retriever, prompt_data= prompt_data, model_type= "chat_qa")
+        assistant = LangChainAssistant(modelId=modelId, bedrock_client=self.boto3_bedrock, retriever= self.retriever, prompt_data= prompt_data, model_type= "chat_doc")
 
         return assistant.model
     
@@ -108,6 +108,23 @@ class ShoppingAssistant():
             for doc in documents:
                 output = f"{output}{doc.page_content}\n"
             return output
+
+        # @tool
+        # def retrieve_products(query: str) -> str:
+        #     """Find and suggest products from catalog based on users needs or preferences in the query. 
+        #     Requires full 'input' question as query.
+        #     Useful for when a user is searching for products, asking for details,
+        #     or want to buy some product.
+        #     Useful for finding products with name, description, color, size, weight and other product attributes.
+        #     Return the output without processing further.
+        #     """
+        #     output = self.product_qa.run(query)
+        #     # documents = self.product_retriever.get_relevant_documents(query)
+        #     # print(documents)
+        #     # output = ''
+        #     # for doc in documents:
+        #     #     output = f"{output}{doc.page_content}\n"
+        #     return output
         
         @tool(return_direct=True)
         def add_product_to_cart(product: str) -> str:
