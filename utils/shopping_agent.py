@@ -12,7 +12,7 @@ class ShoppingAssistant():
         load_dotenv()
         self.boto3_bedrock  = boto3.client(
             service_name="bedrock-runtime",
-            region_name="us-west-2",
+            region_name=os.getenv('REGION'),
         )
         self.logger = logger
         self.modelId = modelId

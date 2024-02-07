@@ -32,7 +32,7 @@ def write_top_bar():
 
 clear = write_top_bar()
 
-modelId="anthropic.claude-v2"
+modelId="anthropic.claude-v2:1"
 
 keywords = [f'Model Id: {modelId}','Amazon Bedrock','Langchain', 'Vector Store: MongoDB Atlas']
 formatted_labels = [keyword_label(keyword) for keyword in keywords]

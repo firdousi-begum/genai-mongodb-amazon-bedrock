@@ -1,5 +1,13 @@
 langchain
 streamlit
 boto3
+awscli
+botocore
 pymongo
-attrs==23.1.0
+attrs
+python-dotenv
+transformers
+pymongo
+pandas
+pillow
+faiss-cpu
