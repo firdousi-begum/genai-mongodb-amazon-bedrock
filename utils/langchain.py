@@ -163,6 +163,7 @@ class LangChainAssistant():
             max_iterations=2,
             agent_kwargs={
                 "prefix": PREFIX,
+                # 'format_instructions':FORMAT_INSTRUCTIONS,
                 'suffix' : SUFFIX,
                 "memory_prompts": [chat_history],
                 "input_variables": ["input", "agent_scratchpad", "chat_history"]
