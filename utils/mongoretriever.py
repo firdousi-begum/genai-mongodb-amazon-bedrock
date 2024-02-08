@@ -62,26 +62,26 @@ class MongoDBExtendedRetriever(BaseRetriever):
         
         #print('In fuction: ',self.vectorstore._index_name, query)
         docs_list = []
-        mongo_query = [
-            {
-                "$search": {
-                    "index": self.vectorstore._index_name,
-                    "knnBeta": {
-                        "vector": self.vectorstore.embeddings.embed_query(query),
-                        "path": "embedding",
-                        "k": 10,
-                    }
-                }
-            }
-        ]
-        docs = self.vectorstore._collection.aggregate(mongo_query)
+        # mongo_query = [
+        #     {
+        #         "$search": {
+        #             "index": self.vectorstore._index_name,
+        #             "knnBeta": {
+        #                 "vector": self.vectorstore.embeddings.embed_query(query),
+        #                 "path": "embedding",
+        #                 "k": 10,
+        #             }
+        #         }
+        #     }
+        # ]
+        # docs = self.vectorstore._collection.aggregate(mongo_query)
 
-        # docs =self.vectorstore.similarity_search(query, **self.search_kwargs)
+        docs =self.vectorstore.similarity_search(query, **self.search_kwargs)
 
         #print('Docs: ',docs)
 
         for doc in docs:
-            content, metadata = self.combine_metadata_c(doc)
+            content, metadata = self.combine_metadata(doc)
             docs_list.append(Document(
                 page_content=content,
                 metadata=metadata
