@@ -136,7 +136,7 @@ class ShoppingAssistant():
             output = f"Added '{product}' to cart."
             return output
         
-        #@tool(return_direct=True)
+        # @tool(return_direct=True)
         @tool
         def get_orders_for_return(query: str) -> str:
             """Gets list of orders available for return request.
@@ -150,7 +150,7 @@ class ShoppingAssistant():
                         "orderId": "OT1002",
                         "items": [
                             {
-                                "name": "Graph Paper",
+                                "name": "Knitted Cap",
                                 "price": "100",
                                 "quantity": "2"
                             }
@@ -191,7 +191,7 @@ class ShoppingAssistant():
             except Exception as e:
                 print(e)
         
-        #@tool(return_direct=True)
+        # @tool(return_direct=True)
         @tool
         def get_return_items(order_no: str) -> str:
             """Gets the list of products in order with order_no.

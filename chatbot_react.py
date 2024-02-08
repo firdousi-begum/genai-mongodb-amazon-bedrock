@@ -26,7 +26,7 @@ def write_top_bar():
 
 clear = write_top_bar()
 
-modelId="anthropic.claude-instant-v1"
+modelId="anthropic.claude-v2:1"
 
 keywords = [f'Model Id: {modelId}','Amazon Bedrock','Langchain', 'Vector Store: MongoDB Atlas']
 formatted_labels = [keyword_label(keyword) for keyword in keywords]
@@ -105,5 +105,20 @@ if __name__ == "__main__":
 
     if "logger" not in st.session_state:
         st.session_state.logger = configure_logging()
+
+    # Add a description for this specific use case
+    st.markdown(
+        '''
+        #### Use case:
+        ###### Welcome to the *Shopping Assistant**, yout personal shopper who has the superpower to find match your needs to 1000s of items in the catalog!
+
+        1. **Suggesting Products**: Shopping Assistant will suggest products that you might want to buy based on your query
+
+        2. **Buying Products**: Shopping Assistant can also help you order products. Ask 'Add the product to my cart'
+
+        3. **Return Products**: Shopping Assistant can also help you return products. Ask 'I want to return items in order OT1002'
+
+
+        ''')  
 
     main()
