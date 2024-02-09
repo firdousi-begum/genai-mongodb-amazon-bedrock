@@ -1,3 +1,4 @@
+anthropic
 langchain
 streamlit
 boto3
@@ -5,7 +6,6 @@ awscli
 botocore
 pymongo
 attrs
-python-dotenv
 transformers
 pymongo
 pandas
