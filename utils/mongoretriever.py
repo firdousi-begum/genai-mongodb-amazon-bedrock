@@ -6,7 +6,7 @@ from pydantic import Field
 from attrs import define
 from typing import  List
 from pymongo import MongoClient
-import certifi # For getting ServerSelectionTimeoutError on mac
+import certifi
 
 @define(kw_only=True)
 class MongoDBVector:
@@ -20,7 +20,7 @@ class MongoDBVector:
         # initialize MongoDB python client
         client = MongoClient(
             self.uri,
-            tlsCAFile=certifi.where() # For getting ServerSelectionTimeoutError on mac
+            tlsCAFile=certifi.where()
         )
         collection = client[self.db_name][self.collection_name]
 

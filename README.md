@@ -14,9 +14,7 @@ Create a MongoDB instance by following the instructions in [the documentation](h
 
 > &#x26a0;&#xfe0f; **Pay attention to the network setup. If you are using SageMaker studio to go along with this tutorial, you will need to expose the MongoDB instance to the internet.**
 
-### Populate instance with embeddings
-
-1. Create a database called `langchain_db` with a collection called `e_commerce` in MongoDB Atlas in the "Collections" tab of your cluster. 
+1. Create a database called `langchain_db` with a collection called `e_commerce` in MongoDB Atlas in the "Collections" tab of your cluster.
 
 2. Then, in the "Atlas Search" tab, create an index, with the following configuration:
 
@@ -39,7 +37,9 @@ Use the database and collection from the previous step, and pass in the followin
 }
 ```
 
-3. Create a `.env` file in the root directory and add the following environment variables:
+### Populate instance with embeddings
+
+1. Create a `.env` file in the root directory and add the following environment variables:
 
 a. The region for Amazon Bedrock as `REGION`
 
@@ -58,7 +58,9 @@ MDB_DATABASE=langchain_db
 MDB_COLLECTION=e_commerce
 ```
 
-4. Follow the notebook [shopping-bot.ipynb](notebook/shopping-bot.ipynb) to download the [product data](https://drive.google.com/file/d/1tHWB6u3yQCuAgOYc-DxtZ8Mru3uV5_lj/view) and embed and store it in MongoDB Atlas Search.
+2. Follow the notebook [shopping-bot.ipynb](shopping-bot.ipynb) to download the [product data](https://drive.google.com/file/d/1tHWB6u3yQCuAgOYc-DxtZ8Mru3uV5_lj/view) and embed and store it in MongoDB Atlas Search.
+
+> **Note:** If you are running the notebook in VSCode, also make sure you run `pip install ipykernel`
 
 ### Run streamlit application
 
@@ -67,5 +69,6 @@ streamlit run chatbot_rag.py
 ```
 
 ### Start chatting
+
 While chatting, check your terminal window to see how the chain is running.
 > NOTE: Set verbose=False for chain `ConversationalRetrievalChain` in the file [langchain.py](utils/langchain.py) if you dont want to see the detailed output.
