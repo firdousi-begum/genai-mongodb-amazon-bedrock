@@ -155,6 +155,7 @@ cython_debug/
 # Custom ignores
 aienv
 data
+.DS_STORE
 
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can

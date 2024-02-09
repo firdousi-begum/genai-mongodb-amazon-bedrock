@@ -58,7 +58,9 @@ MDB_DATABASE=langchain_db
 MDB_COLLECTION=e_commerce
 ```
 
-2. Follow the notebook [shopping-bot.ipynb](shopping-bot.ipynb) to download the [product data](https://drive.google.com/file/d/1tHWB6u3yQCuAgOYc-DxtZ8Mru3uV5_lj/view) and embed and store it in MongoDB Atlas Search.
+2. Create a folder called "data" at the root of this repository. Download the [product data](https://drive.google.com/file/d/1tHWB6u3yQCuAgOYc-DxtZ8Mru3uV5_lj/view) and save it to the newly created "data" folder.
+
+3. Follow the notebook [shopping-bot.ipynb](shopping-bot.ipynb) to embed and store the data in MongoDB Atlas Search.
 
 > **Note:** If you are running the notebook in VSCode, also make sure you run `pip install ipykernel`
 
