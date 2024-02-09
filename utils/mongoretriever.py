@@ -6,6 +6,7 @@ from pydantic import Field
 from attrs import define
 from typing import  List
 from pymongo import MongoClient
+import certifi
 
 @define(kw_only=True)
 class MongoDBVector:
@@ -17,7 +18,10 @@ class MongoDBVector:
     def get_vector_db(self, embeddings):
 
         # initialize MongoDB python client
-        client = MongoClient(self.uri)
+        client = MongoClient(
+            self.uri,
+            tlsCAFile=certifi.where()
+        )
         collection = client[self.db_name][self.collection_name]
 
         vectordb = MongoDBAtlasVectorSearch(
