@@ -11,3 +11,4 @@ pymongo
 pandas
 pillow
 faiss-cpu
+anthropic
