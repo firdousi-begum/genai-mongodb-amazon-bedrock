@@ -1,28 +1,25 @@
 import boto3
 from langchain.embeddings import BedrockEmbeddings
-from dotenv import load_dotenv
 from utils.mongoretriever import MongoDBExtendedRetriever, MongoDBVector
 from utils.langchain import LangChainAssistant
 from langchain.tools import tool
 from langchain.tools import StructuredTool
-import os
+from utils.load_env import load_env
 
 class ShoppingAssistant():
     def __init__(self,modelId,prompt_data, model_type="chat_doc", logger= None):
-        load_dotenv()
+        env = load_env()
         self.boto3_bedrock  = boto3.client(
             service_name="bedrock-runtime",
-            region_name=os.getenv('REGION'),
+            region_name=env.get('REGION'),
         )
         self.logger = logger
         self.modelId = modelId
         self.br_embeddings = BedrockEmbeddings(client=self.boto3_bedrock, model_id='amazon.titan-embed-text-v1')
         self.domain_index = "products-metadata"
-        self.mdb_endpoint = f"mongodb+srv://{os.environ.get('MDB_USERNAME')}:{os.environ.get('MDB_PASSWORD')}@{os.environ.get('MDB_HOST')}/?retryWrites=true&w=majority"
-        self.mdb_username = os.environ.get('MDB_USERNAME')
-        self.mdb_password = os.environ.get('MDB_PASSWORD')
-        self.mdb_collection = os.environ.get('MDB_COLLECTION')
-        self.mdb_database = os.environ.get('MDB_DATABASE')
+        self.mdb_endpoint = env.get('MDB_URI')
+        self.mdb_collection = env.get('MDB_COLLECTION')
+        self.mdb_database = env.get('MDB_DATABASE')
         self.retriever = self.get_retriever( search_kwargs={"k": 7})
         self.product_qa = self.get_product_qa()
         self.tools = self.get_tools()

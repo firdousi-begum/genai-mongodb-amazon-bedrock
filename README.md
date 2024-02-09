@@ -12,29 +12,53 @@ Visit the [Amazon Bedrock documentation](https://docs.aws.amazon.com/bedrock/lat
 
 Create a MongoDB instance by following the instructions in [the documentation](https://www.mongodb.com/basics/create-database).  Note down the host, username, and password.
 
-> &#x26a0;&#xfe0f; **Pay attention to the network setup. If you are using SageMaker studio to go along with this tutorial, you will need to expose the MongoDB instance to the internet.**:
+> &#x26a0;&#xfe0f; **Pay attention to the network setup. If you are using SageMaker studio to go along with this tutorial, you will need to expose the MongoDB instance to the internet.**
 
 ### Populate instance with embeddings
 
-1. Create a `.env` file in the root directory and add the following environment variables:
+1. Create a database called `langchain_db` with a collection called `e_commerce` in MongoDB Atlas in the "Collections" tab of your cluster. 
 
-```env
-MDB_HOST="REPLACE_WITH_HOST_NAME.mongodb.net"
-MDB_USERNAME="REPLACE_WITH_YOUR_USERNAME"
-MDB_PASSWORD="REPLACE_WITH_YOUR_PASSWORD"
+2. Then, in the "Atlas Search" tab, create an index, with the following configuration:
+
+![Step One](images/searchs1.png)
+
+![Step Two](images/searchs2.png)
+
+Use the database and collection from the previous step, and pass in the following JSON into the JSON Editor:
+
+```json
+{
+  "fields": [
+    {
+      "type": "vector",
+      "numDimensions": 1536,
+      "similarity": "cosine",
+      "path" :"embedding"
+    }
+  ]
+}
 ```
 
-2. Follow the notebook [shopping-bot.ipynb](notebook/shopping-bot.ipynb) to download product data and embed and store in MongoDB Vector
+3. Create a `.env` file in the root directory and add the following environment variables:
 
-3. Update the `.env` file in the root directory and add the collection and database names as well:
+a. The region for Amazon Bedrock as `REGION`
+
+b. The connection string to your MongoDB cluster as `MDB_URI`
+
+c. The database name as `MDB_DATABASE`
+
+d. The collection name as `MDB_COLLECTION`
+
+For example:
 
 ```env
-MDB_HOST="REPLACE_WITH_HOST_NAME.mongodb.net"
-MDB_USERNAME="REPLACE_WITH_YOUR_USERNAME"
-MDB_PASSWORD="REPLACE_WITH_YOUR_PASSWORD"
-MDB_COLLECTION="REPLACE_WITH_YOUR_COLLECTION"
-MDB_DATABASE="REPLACE_WITH_YOUR_DATABASE"
+REGION=us-west-2
+MDB_URI=mongodb+srv://{USERNAME}:{PASSWORD}@{HOSTNAME}.mongodb.net/?retryWrites=true&w=majority
+MDB_DATABASE=langchain_db
+MDB_COLLECTION=e_commerce
 ```
+
+4. Follow the notebook [shopping-bot.ipynb](notebook/shopping-bot.ipynb) to download the [product data](https://drive.google.com/file/d/1tHWB6u3yQCuAgOYc-DxtZ8Mru3uV5_lj/view) and embed and store it in MongoDB Atlas Search.
 
 ### Run streamlit application
 
@@ -44,4 +68,4 @@ streamlit run chatbot_rag.py
 
 ### Start chatting
 While chatting, check your terminal window to see how the chain is running.
-> NOTE: Set verbose=False for chain `ConversationalRetrievalChain` in the file [langchain.py](utils/langchain.py) if you dont want to see detail output.
+> NOTE: Set verbose=False for chain `ConversationalRetrievalChain` in the file [langchain.py](utils/langchain.py) if you dont want to see the detailed output.
