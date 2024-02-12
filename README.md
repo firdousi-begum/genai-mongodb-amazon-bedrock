@@ -4,25 +4,52 @@ This repository contains code samples for a chatbot using Amazon Bedrock, LangCh
 
 ### Gain Model Access from Amazon Bedrock Console
 
-Visit the [Amazon Bedrock documentation](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html) for instructions on gaining model access. For Claude access, use the `us-east-1` or `us-west-2` region. 
+Visit the [Amazon Bedrock documentation](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html) for instructions on gaining model access. For Claude access, use the `us-east-1` or `us-west-2` region.
 
 > NOTE: This codebase uses the region `us-west-2`. Please update the region in the `.env` file if using another region.
 
-### Create MongoDB instance 
+### Create MongoDB instance
 
-Create a MongoDB instance by following the instructions in [the documentation](https://www.mongodb.com/basics/create-database).  Note down the host, username, and password.
+In this section, we will set up a MongoDB Atlas cluster and database cluster. We will launch a cluster using the Atlas console and set up a **free-tier cluster**. You can find more information in [the documentation](https://www.mongodb.com/basics/create-database). However, you
 
-> &#x26a0;&#xfe0f; **Pay attention to the network setup. If you are using SageMaker studio to go along with this tutorial, you will need to expose the MongoDB instance to the internet.**
+1 - Create an account on [MongoDB Atlas](https://cloud.mongodb.com/) or login with an existing account
 
-1. Create a database called `langchain_db` with a collection called `e_commerce` in MongoDB Atlas in the "Collections" tab of your cluster.
+2 - Choose Build a Database to start the database configuration. Select the **M0 option from the free tier** and AWS as provider. Set the region to `us-east-1` (or to the region where you run the workshop).
 
-2. Then, in the "Atlas Search" tab, create an index, with the following configuration:
+> ℹ️ Note that it's ok to have the MongoDB cluster in a different region (us-east-1) while the codebase uses the region (`us-east-2`)
 
-![Step One](images/searchs1.png)
+![build a new database cluster](images/mongodb-atlas-1.png)
+![free cluster](images/mongodb-atlas-2.png)
 
-![Step Two](images/searchs2.png)
+3 - You should be navigated to the Security Quickstart view. In the Security Quickstart view, create the database Username and Password. You will need them later to set up the connectivity to your cluster. Choose Create User once you defined the credentials.
 
-Use the database and collection from the previous step, and pass in the following JSON into the JSON Editor:
+When being asked about the network access for the connection, keep the selection to My Local Environment and let your local IP, which is added automatically, be appended to the IP Access List.
+
+Choose Finish and Close to finalize the setup.
+
+![create user](images/mongodb-atlas-2-5.png)
+
+> ℹ️ If you skip the User creation above, you can create the user using the _"Database Access"_ option on the botton left of Atlas console.
+
+4 - Now go to the _"Network Access"_ option on the botton left, click on _"+ Add IP Address"_, choose the option to _"Allow Access From Anywhere"_, and set this entry to be deleted after the duration of the workshop.
+
+> &#x26a0;&#xfe0f; If you are using SageMaker studio to go along with this tutorial, this will ensure the MongoDB instance is accessible via internet.
+
+![network access open](images/mongodb-atlas-3.png)
+
+5 - Now choose the _"Database"_ option on the left panel, then click on _"Browse Collections"_ of your newly created cluster. (It can take a few minutes for your cluster to become available)
+
+![browse collections](images/mongodb-atlas-4.png)
+
+6 - Click on _"Add you Own Data"_ and create a database called `langchain_db` with a collection called `e_commerce`. Leave the additional preferences empty, and click _"Create"_.
+
+![create database and collection](images/mongodb-atlas-5.png)
+
+7 - Then, in the _"Atlas Search"_ tab, create an index, select the option **"Atlas Vector Search > JSON Editor"**, then click next:
+
+![create index](images/mongodb-atlas-6.png)
+
+8 - Select the collection `e_commerce` you just created. Set the Index name to `products-metadata` and add the following JSON into the JSON Editor:
 
 ```json
 {
@@ -37,13 +64,19 @@ Use the database and collection from the previous step, and pass in the followin
 }
 ```
 
+![vector search index](images/mongodb-atlas-7.png)
+
+9 - Last, choose the _"Database"_ option on the left panel, then click on _"Connect"_ buttom of your cluster and follow the instructions `Driver -> Python` to find the connection string.
+
+Note down the connection string to use it later.
+
 ### Populate instance with embeddings
 
 1. Create a `.env` file in the root directory and add the following environment variables:
 
 a. The region for Amazon Bedrock as `REGION`
 
-b. The connection string to your MongoDB cluster as `MDB_URI`
+b. The connection string to your MongoDB cluster as `MDB_URI`. Write the actual username and password you from the previous step 3.
 
 c. The database name as `MDB_DATABASE`
 
