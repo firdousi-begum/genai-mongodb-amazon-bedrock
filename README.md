@@ -113,13 +113,13 @@ MDB_COLLECTION=e_commerce
 
 Using Amazon SageMaker Studio, this workshop has been tested using the following image and instance type. 
 
-![image-20240213150557228](./assets/image-20240213150557228.png)
+![image-20240213150557228](./images/image-20240213150557228.png)
 
 Please wait as SageMaker initialize the kernel.
 
 After sucessfully loading the kernel, you should see the kernel details as indicated below. 
 
-![image-20240213150727946](./assets/image-20240213150727946.png)
+![image-20240213150727946](./images/image-20240213150727946.png)
 
 
 
