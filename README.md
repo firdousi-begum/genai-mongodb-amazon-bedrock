@@ -6,7 +6,7 @@ This repository contains code samples for a chatbot using Amazon Bedrock, LangCh
 
 ## Pre-Requisities
 
-You can run this workshop using your own IDE (e.g. VSCode) or through SageMaker Studio. 
+You can run this workshop using your own IDE (e.g. VSCode) or through Amazon SageMaker Studio. 
 
 
 
@@ -108,6 +108,18 @@ MDB_COLLECTION=e_commerce
 2. Follow the notebook [shopping-bot.ipynb](shopping-bot.ipynb) to unpack the dataset, and embed and store the dataset in MongoDB Atlas Search.
 
 > **Note:** If you are running the notebook in VSCode, also make sure you run `pip install ipykernel`
+
+
+
+Using Amazon SageMaker Studio, this workshop has been tested using the following image and instance type. 
+
+![image-20240213150557228](./assets/image-20240213150557228.png)
+
+Please wait as SageMaker initialize the kernel.
+
+After sucessfully loading the kernel, you should see the kernel details as indicated below. 
+
+![image-20240213150727946](./assets/image-20240213150727946.png)
 
 
 
