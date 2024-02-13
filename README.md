@@ -2,21 +2,29 @@
 
 This repository contains code samples for a chatbot using Amazon Bedrock, LangChain & MongpDB Atlas Vector Search.
 
-### Gain Model Access from Amazon Bedrock Console
+
+
+## Pre-Requisities
+
+You can run this workshop using your own IDE (e.g. VSCode) or through SageMaker Studio. 
+
+
+
+## Gain Model Access from Amazon Bedrock Console
 
 Visit the [Amazon Bedrock documentation](https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html) for instructions on gaining model access. For Claude access, use the `us-east-1` or `us-west-2` region.
 
 > NOTE: This codebase uses the region `us-west-2`. Please update the region in the `.env` file if using another region.
 
-### Create MongoDB instance
+## Create MongoDB instance
 
 In this section, we will set up a MongoDB Atlas cluster and database cluster. We will launch a cluster using the Atlas console and set up a **free-tier cluster**. You can find more information in [the documentation](https://www.mongodb.com/basics/create-database). However, you
 
 1 - Create an account on [MongoDB Atlas](https://cloud.mongodb.com/) or login with an existing account
 
-2 - Choose Build a Database to start the database configuration. Select the **M0 option from the free tier** and AWS as provider. Set the region to `us-east-1` (or to the region where you run the workshop).
+2 - Choose Build a Database to start the database configuration. Select the **M0 option from the free tier** and AWS as provider. Set the region to `us-west-2` (or to the region where you run the workshop).
 
-> ℹ️ Note that it's ok to have the MongoDB cluster in a different region (us-east-1) while the codebase uses the region (`us-east-2`)
+> ℹ️ Note that it's ok to have the MongoDB cluster in a different region (us-east-1) while the codebase uses the region (`us-west-2`)
 
 ![build a new database cluster](images/mongodb-atlas-1.png)
 ![free cluster](images/mongodb-atlas-2.png)
@@ -70,7 +78,11 @@ Choose Finish and Close to finalize the setup.
 
 Note down the connection string to use it later.
 
-### Populate instance with embeddings
+## Populate instance with embeddings
+
+In this section, we will convert the text into a vector representation and store them into the MongoDB Atlas Vector index created in the previous section. 
+
+We start by using the correct credentials to access the database, unpacking the dataset and loading it to the vector database.
 
 1. Create a `.env` file in the root directory and add the following environment variables:
 
@@ -91,13 +103,15 @@ MDB_DATABASE=langchain_db
 MDB_COLLECTION=e_commerce
 ```
 
-2. Create a folder called "data" at the root of this repository. Download the [product data](https://drive.google.com/file/d/1tHWB6u3yQCuAgOYc-DxtZ8Mru3uV5_lj/view) and save it to the newly created "data" folder.
 
-3. Follow the notebook [shopping-bot.ipynb](shopping-bot.ipynb) to embed and store the data in MongoDB Atlas Search.
+
+2. Follow the notebook [shopping-bot.ipynb](shopping-bot.ipynb) to unpack the dataset, and embed and store the dataset in MongoDB Atlas Search.
 
 > **Note:** If you are running the notebook in VSCode, also make sure you run `pip install ipykernel`
 
-### Run streamlit application
+
+
+## Run streamlit application
 
 ```bash
 streamlit run chatbot_rag.py

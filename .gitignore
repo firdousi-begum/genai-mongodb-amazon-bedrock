@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# slies
+presentation/*
+
 # C extensions
 *.so
 
@@ -154,7 +157,7 @@ cython_debug/
 
 # Custom ignores
 aienv
-data
+#data
 .DS_STORE
 
 # PyCharm
